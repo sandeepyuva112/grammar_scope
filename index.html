@@ -4,7 +4,6 @@
 <title>GrammarScope - Smart Grammar Analyzer</title>
 
 <style>
-
 body{
 font-family:Arial;
 padding:20px;
@@ -12,7 +11,7 @@ margin:0;
 overflow:hidden;
 }
 
-/* BACKGROUND IMAGE WITH ZOOM ANIMATION */
+/* BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -31,7 +30,6 @@ animation: zoomBg 20s infinite alternate;
 100%{transform:scale(1.2);}
 }
 
-/* DARK OVERLAY */
 body::after{
 content:"";
 position:fixed;
@@ -99,13 +97,13 @@ background:#fce4ec;
 border-radius:10px;
 text-align:left;
 }
-
 </style>
 </head>
 
 <body>
 
 <script>
+// particles
 for(let i=0;i<40;i++){
 let p = document.createElement("div");
 p.className="particle";
@@ -147,23 +145,74 @@ let words = sentence.toLowerCase().match(/\b\w+\b/g);
 
 let singular = [];
 let plural = [];
+let verbs = [];
 
+// ignore words
 let ignoreWords = ["i","am","is","are","was","were","be","been","being","a","an","the"];
 
+// pronouns
+let pronouns = ["i","we","you","he","she","it","they","me","us","him","her","them"];
+
+// adjectives
+let adjectives = ["good","bad","happy","sad","big","small","fast","slow","beautiful"];
+
+// irregular plurals
+let irregularPlural = ["men","women","children","people","feet","teeth"];
+
+// verbs list
+let verbsList = [
+"is","am","are","was","were","be","been","being",
+"have","has","had","do","does","did",
+"go","goes","went","gone",
+"eat","eats","ate","eating",
+"run","runs","ran","running",
+"play","plays","played","playing",
+"read","reads","reading",
+"write","writes","writing",
+"see","sees","saw","seen",
+"make","makes","made",
+"take","takes","took","taken"
+];
+
 words.forEach(w=>{
-    if(w.endsWith("s")){
+
+    // skip pronouns
+    if(pronouns.includes(w)){
+        return;
+    }
+
+    // verbs
+    if(verbsList.includes(w)){
+        verbs.push(w);
+        return;
+    }
+
+    // ignore + adjectives
+    if(ignoreWords.includes(w) || adjectives.includes(w)){
+        return;
+    }
+
+    // plural
+    if(irregularPlural.includes(w)){
         plural.push(w);
-    }else if(!ignoreWords.includes(w)){
+    }
+    else if(w.endsWith("s") && !w.endsWith("ss") && w.length > 3){
+        plural.push(w);
+    }
+    else{
         singular.push(w);
     }
+
 });
 
+// pronouns
 let subjectPronouns = ["i","we","you","he","she","it","they"];
 let objectPronouns = ["me","us","him","her","them"];
 
 let subjects = words.filter(w => subjectPronouns.includes(w));
 let objects = words.filter(w => objectPronouns.includes(w));
 
+// person
 let first = ["i","we","me","us","my","our","mine","ours"];
 let second = ["you","your","yours"];
 let third = ["he","she","it","they","him","her","them","their","his","hers","its","theirs"];
@@ -172,18 +221,20 @@ let firstP = words.filter(w=>first.includes(w));
 let secondP = words.filter(w=>second.includes(w));
 let thirdP = words.filter(w=>third.includes(w));
 
-/* NEW FEATURE */
+// possessive
 let possessiveAdjectives = ["my","your","his","her","its","our","their"];
 let possessivePronouns = ["mine","yours","his","hers","its","ours","theirs"];
 
 let possAdj = words.filter(w => possessiveAdjectives.includes(w));
 let possPro = words.filter(w => possessivePronouns.includes(w));
 
+// output
 document.getElementById("result").innerHTML =
 "<b>Analysis:</b><br><br>" +
 
 "<b>Singular Nouns:</b> " + (singular.length ? singular.join(", ") : "None") + "<br>" +
-"<b>Plural Nouns:</b> " + (plural.length ? plural.join(", ") : "None") + "<br><br>" +
+"<b>Plural Nouns:</b> " + (plural.length ? plural.join(", ") : "None") + "<br>" +
+"<b>Verbs:</b> " + (verbs.length ? verbs.join(", ") : "None") + "<br><br>" +
 
 "<b>Subject Pronouns:</b> " + (subjects.length ? subjects.join(", ") : "None") + "<br>" +
 "<b>Object Pronouns:</b> " + (objects.length ? objects.join(", ") : "None") + "<br><br>" +
